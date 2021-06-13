@@ -1,0 +1,30 @@
+name: Windows 10 vps free
+
+on: 
+  workflow_dispatch:
+    inputs:
+      authcode:
+        description: 'Enter CRD code'
+        required: true
+      pincode:
+        description: 'Six digit Pin'
+        required: true
+
+  
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 9999999
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Initializing Setup
+      run: ./setup.ps1
+    - name: Downloading Files
+      run: |
+        Invoke-WebRequest ${{ secrets.URL }} -OutFile Files.zip
+        Expand-Archive -Path Files.Zip -DestinationPath C:\Users\runneradmin\Downloads\Stream
+    - name: Starting CRD
+      run: ${{ github.event.inputs.authcode }} -pin=${{ github.event.inputs.pincode }}
+    - name: Alive
+      run: ./timeout.ps1
